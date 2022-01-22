@@ -11,7 +11,7 @@ Variants:
 """
 from __future__ import print_function
 
-import sys
+import sys, signal
 
 from _devbuild.gen.syntax_asdl import (
     command_t, command, parse_result__Node, parse_result_e
@@ -203,6 +203,8 @@ if mylib.PYTHON:
       # - display.EraseLines() needs to be called BEFORE displaying anything, so
       # it appears in all branches.
 
+      signal.signal(signal.SIGWINCH, lambda x, y: display.OnWindowChange())
+
       while True:  # ONLY EXECUTES ONCE
         prompt_plugin.Run()
         try:
@@ -247,6 +249,8 @@ if mylib.PYTHON:
           break
 
         display.EraseLines()  # Clear candidates right before executing
+
+        signal.signal(signal.SIGWINCH, signal.SIG_IGN)
 
         # to debug the slightly different interactive prasing
         if cmd_ev.exec_opts.noexec():
